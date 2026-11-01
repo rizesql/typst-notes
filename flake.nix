@@ -20,10 +20,14 @@
           pkgs,
           name ? "notes",
           packages ? [ ],
+          # Universe packages from nixpkgs, pinned by version: `p: [ p.cetz_0_4_2 ]`.
+          # `typst.withPackages` pulls in their dependencies and puts them on
+          # TYPST_PACKAGE_CACHE_PATH, so `@preview/...` imports resolve without network.
+          typstPackages ? (_: [ ]),
         }:
         let
           # Typst resolves `@local/notes:0.1.0` to $TYPST_PACKAGE_PATH/local/notes/0.1.0.
-          typstPackages = pkgs.runCommand "typst-packages" { } ''
+          localPackages = pkgs.runCommand "typst-packages" { } ''
             dir=$out/local/${manifest.name}/${manifest.version}
             mkdir -p $dir
             cp ${./typst.toml} $dir/typst.toml
@@ -32,9 +36,9 @@
         in
         pkgs.mkShell {
           inherit name;
-          nativeBuildInputs = [ pkgs.typst ] ++ packages;
+          nativeBuildInputs = [ (pkgs.typst.withPackages typstPackages) ] ++ packages;
 
-          TYPST_PACKAGE_PATH = "${typstPackages}";
+          TYPST_PACKAGE_PATH = "${localPackages}";
           # Typst only scans system font dirs, not the Nix store. With system fonts off, the
           # PDF depends only on these and Typst's embedded fonts.
           TYPST_FONT_PATHS = builtins.concatStringsSep ":" [

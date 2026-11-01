@@ -21,6 +21,9 @@
           devShells.default = notes.lib.mkShell {
             inherit pkgs;
             name = "course";
+            # Typst Universe packages, pinned by version: `p: [ p.cetz_0_4_2 ]`. List the
+            # names with `nix eval nixpkgs#typstPackages --apply builtins.attrNames`.
+            typstPackages = p: [ ];
           };
         };
     };
