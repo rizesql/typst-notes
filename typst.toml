@@ -1,0 +1,6 @@
+[package]
+name = "notes"
+version = "0.1.0"
+entrypoint = "lib.typ"
+authors = ["Iulian Stefan Rizescu"]
+description = "Course notes: page style, linked notes, named statements."
